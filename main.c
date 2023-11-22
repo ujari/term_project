@@ -130,34 +130,41 @@ void select_elevator_for_maintenance() {  // 엘리베이터 점검을 선택하는 함수를 �
 
         if (pick == 0)  // 사용자가 점검을 선택한 경우
         {
-            printf("점검 해제는 0번 점검 설정은 1번을 눌러주세요 >> ");  // 사용자에게 점검 상태를 선택하도록 요청하는 메시지를 출력합니다.
-            scanf("%d", &lift);  // 사용자의 입력을 받아 'lift' 변수에 저장합니다.
-
-            if (lift == 1)  // 사용자가 점검 설정을 선택한 경우
+            while ((lift != 0) || (lift != 1))
             {
-                int elevator;  // 점검할 엘리베이터 번호를 저장하는 변수를 선언합니다.
-                printf("점검할 엘리베이터를 선택해주세요 (1-6): ");  // 사용자에게 점검할 엘리베이터 번호를 입력하도록 요청하는 메시지를 출력합니다.
-                scanf("%d", &elevator);  // 사용자의 입력을 받아 'elevator' 변수에 저장합니다.
 
-                if (elevator >= 1 && elevator <= MAX_ELEVATORS) {  // 사용자가 올바른 엘리베이터 번호를 입력한 경우
-                    ele.status[elevator - 1] = 1;  // 해당 엘리베이터의 상태를 점검 중(1)으로 변경합니다.
-                    printf("%d번 엘리베이터가 점검 모드로 전환되었습니다.\n", elevator);  // 점검 모드 전환 메시지를 출력합니다.
-                }
-                else {  // 사용자가 잘못된 엘리베이터 번호를 입력한 경우
-                    printf("잘못된 엘리베이터 번호입니다.\n");  // 오류 메시지를 출력합니다.
-                }
-            }
-            else {  // 사용자가 점검 해제를 선택한 경우
-                int elevator;  // 점검을 해제할 엘리베이터 번호를 저장하는 변수를 선언합니다.
-                printf("해제할 엘리베이터를 선택해주세요 (1-6): ");  // 사용자에게 점검을 해제할 엘리베이터 번호를 입력하도록 요청하는 메시지를 출력합니다.
-                scanf("%d", &elevator);  // 사용자의 입력을 받아 'elevator' 변수에 저장합니다.
+                printf("점검 해제는 0번 점검 설정은 1번을 눌러주세요 >> ");  // 사용자에게 점검 상태를 선택하도록 요청하는 메시지를 출력합니다.
+                scanf("%d", &lift);  // 사용자의 입력을 받아 'lift' 변수에 저장합니다.
 
-                if (elevator >= 1 && elevator <= MAX_ELEVATORS) {  // 사용자가 올바른 엘리베이터 번호를 입력한 경우
-                    ele.status[elevator - 1] = 0;  // 해당 엘리베이터의 상태를 정상(0)으로 변경합니다.
-                    printf("%d번 엘리베이터가 점검 해제로 전환되었습니다.\n", elevator);  // 점검 해제 메시지를 출력합니다.
+                if (lift == 1)  // 사용자가 점검 설정을 선택한 경우
+                {
+                    int elevator;  // 점검할 엘리베이터 번호를 저장하는 변수를 선언합니다.
+                    printf("점검할 엘리베이터를 선택해주세요 (1-6): ");  // 사용자에게 점검할 엘리베이터 번호를 입력하도록 요청하는 메시지를 출력합니다.
+                    scanf("%d", &elevator);  // 사용자의 입력을 받아 'elevator' 변수에 저장합니다.
+
+                    if (elevator >= 1 && elevator <= MAX_ELEVATORS) {  // 사용자가 올바른 엘리베이터 번호를 입력한 경우
+                        ele.status[elevator - 1] = 1;  // 해당 엘리베이터의 상태를 점검 중(1)으로 변경합니다.
+                        printf("%d번 엘리베이터가 점검 모드로 전환되었습니다.\n", elevator);  // 점검 모드 전환 메시지를 출력합니다.
+                    }
+                    else {  // 사용자가 잘못된 엘리베이터 번호를 입력한 경우
+                        printf("잘못된 엘리베이터 번호입니다.\n");  // 오류 메시지를 출력합니다.
+                    }
                 }
-                else {  // 사용자가 잘못된 엘리베이터 번호를 입력한 경우
-                    printf("잘못된 엘리베이터 번호입니다.\n");  // 오류 메시지를 출력합니다.
+                else if (lift == 0) {  // 사용자가 점검 해제를 선택한 경우
+                    int elevator;  // 점검을 해제할 엘리베이터 번호를 저장하는 변수를 선언합니다.
+                    printf("해제할 엘리베이터를 선택해주세요 (1-6): ");  // 사용자에게 점검을 해제할 엘리베이터 번호를 입력하도록 요청하는 메시지를 출력합니다.
+                    scanf("%d", &elevator);  // 사용자의 입력을 받아 'elevator' 변수에 저장합니다.
+
+                    if (elevator >= 1 && elevator <= MAX_ELEVATORS) {  // 사용자가 올바른 엘리베이터 번호를 입력한 경우
+                        ele.status[elevator - 1] = 0;  // 해당 엘리베이터의 상태를 정상(0)으로 변경합니다.
+                        printf("%d번 엘리베이터가 점검 해제로 전환되었습니다.\n", elevator);  // 점검 해제 메시지를 출력합니다.
+                    }
+                    else {  // 사용자가 잘못된 엘리베이터 번호를 입력한 경우
+                        printf("잘못된 엘리베이터 번호입니다.\n");  // 오류 메시지를 출력합니다.
+                    }
+                }
+                else {
+                    break;
                 }
             }
         }
@@ -175,8 +182,10 @@ void Inspection_confirm(int i) // 엘리베이터의 점검 상태를 확인하고 처리하는 함�
 {
     if (elevatorStatus[i] == 1) { // 만약 엘리베이터가 점검중인 경우,
         ele.status[i] = 3; // 엘리베이터의 상태를 "점검중"으로 설정합니다.
-        ele.user_floor[i] = -11; // 엘리베이터의 현재 층을 임의의 값으로 설정합니다.
+        ele.user_floor[i] =-10; // 엘리베이터의 현재 층을 임의의 값으로 설정합니다.
         ele.direction[i] = 0; // 엘리베이터의 방향을 "정지"로 설정합니다.
+        ele.floor[i] = 0;
+        ele.kg[i] = 0;
     }
     else { // 엘리베이터가 점검중이 아닌 경우,
         weight[i] = calculate_weight(random_gender()); // 엘리베이터의 무게를 임의의 값으로 설정합니다.
@@ -499,7 +508,7 @@ void display_elevator_status() // 엘리베이터의 상태를 출력하는 함수를 정의합니다
     printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");// 각 엘리베이터의 상태를 구분하는 라인을 출력합니다.
     printf("  Floor: %3d   Floor: %3d   Floor: %3d   Floor: %3d   Floor: %3d   Floor: %3d \n", ele.floor[0], ele.floor[1], ele.floor[2], ele.floor[3], ele.floor[4], ele.floor[5]);// 각 엘리베이터의 현재 층을 출력합니다.
     printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");// 각 엘리베이터의 상태를 구분하는 라인을 출력합니다.
-    printf("   무게 : %3d  무게 : %3d   무게 : %3d   무게 : %3d   무게 : %3d   무게 : %3d \n", ele.kg[0], ele.kg[1], ele.kg[2], ele.kg[3], ele.kg[4], ele.kg[5]);
+    printf("  무게 : %3d  무게 : %3d   무게 : %3d   무게 : %3d   무게 : %3d   무게 : %3d \n", ele.kg[0], ele.kg[1], ele.kg[2], ele.kg[3], ele.kg[4], ele.kg[5]);
     printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");// 각 엘리베이터의 상태를 구분하는 라인을 출력합니다.
     printf(" ");
     printf(" ");
@@ -545,10 +554,6 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
 {
     int weight[6] = { 0 }; // 각 엘리베이터의 탑승자 무게를 저장하는 배열 추가
 
-    for (int i = 0;i < 6;i++)
-    {
-        ele.floor[i] = random();// 각 엘리베이터의 초기 위치를 무작위로 설정합니다.
-    }
 
     // 사용자의 현재 층과 원하는 목적지를 입력받습니다.
     int a = user_location(); // 사용자의 현재 층을 입력받습니다.
@@ -559,69 +564,61 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
     Sleep(1500); // 1.5초 대기합니다.
 
     // 그리고 반환값 + 1에 해당하는 변수들만 a와 floor로 설정합니다.
-    switch (index + 1) {
+    switch (index) {
     default://index +1 1,2,3,4,5,6 이 아닐경우
         break;//멈춤
-    case 1: //index +1 가 1일 경우
-        target_floor1 = f;//target_floor1를 f 로 저장
-        user_floor1 = a;//user_floor1를 a로 저장
+    case 0: //index +1 가 1일 경우
+        ele.target[0] = f;//target_floor1를 f 로 저장
+        ele.user_floor[0] = a;//user_floor1를 a로 저장
         break;//멈춤
-    case 2://index +1 가 2일 경우
-        target_floor2 = f;//target_floor2를 f 로 저장
-        user_floor2 = a;//user_floor2를 a로 저장
+    case 1://index +1 가 2일 경우
+        ele.target[1] = f;//target_floor2를 f 로 저장
+        ele.user_floor[1] = a;//user_floor2를 a로 저장
         break;//멈춤
-    case 3://index +1 가 3일 경우
-        target_floor3 = f;//target_floor3를 f 로 저장
-        user_floor3 = a;//user_floor3를 a로 저장
+    case 2://index +1 가 3일 경우
+        ele.target[2] = f;//target_floor3를 f 로 저장
+        ele.user_floor[2] = a;//user_floor3를 a로 저장
         break;//멈춤
-    case 4://index +1 가 4일 경우
-        target_floor4 = f;//target_floor4를 f 로 저장
-        user_floor4 = a;//user_floor4를 a로 저장
+    case 3://index +1 가 4일 경우
+        ele.target[3] = f;//target_floor4를 f 로 저장
+        ele.user_floor[3] = a;//user_floor4를 a로 저장
         break;//멈춤
-    case 5://index +1 가 5일 경우
-        target_floor5 = f;//target_floor5를 f 로 저장
-        user_floor5 = a;//user_floor5를 a로 저장
+    case 4://index +1 가 5일 경우
+        ele.target[4] = f;//target_floor5를 f 로 저장
+        ele.user_floor[4] = a;//user_floor5를 a로 저장
         break;//멈춤
-    case 6://index +1 가 6일 경우
-        target_floor6 = f;//target_floor6를 f 로 저장
-        user_floor6 = a;//user_floor6를 a로 저장
+    case 5://index +1 가 6일 경우
+        ele.target[5] = f;//target_floor6를 f 로 저장
+        ele.user_floor[5] = a;//user_floor6를 a로 저장
         break;//멈춤
     }
 
     // 각 엘리베이터의 사용자 현재 위치와 목적지를 설정합니다.
-    ele.user_floor[0] = user_floor1;//1번 엘리베이터에 탑승자의 현재위치를 저장합니다.
-    ele.user_floor[1] = user_floor2;//2번 엘리베이터에 탑승자의 현재위치를 저장합니다.
-    ele.user_floor[2] = user_floor3;//3번 엘리베이터에 탑승자의 현재위치를 저장합니다.
-    ele.user_floor[3] = user_floor4;//4번 엘리베이터에 탑승자의 현재위치를 저장합니다.
-    ele.user_floor[4] = user_floor5;//5번 엘리베이터에 탑승자의 현재위치를 저장합니다.
-    ele.user_floor[5] = user_floor6;//6번 엘리베이터에 탑승자의 현재위치를 저장합니다.
-
-    ele.target[0] = target_floor1;//1번 엘리베이터에 탑승자의 목표 층 위치를 저장합니다.
-    ele.target[1] = target_floor2;//2번 엘리베이터에 탑승자의 목표 층 위치를 저장합니다.
-    ele.target[2] = target_floor3;//3번 엘리베이터에 탑승자의 목표 층 위치를 저장합니다.
-    ele.target[3] = target_floor4;//4번 엘리베이터에 탑승자의 목표 층 위치를 저장합니다.
-    ele.target[4] = target_floor5;//5번 엘리베이터에 탑승자의 목표 층 위치를 저장합니다.
-    ele.target[5] = target_floor6;//6번 엘리베이터에 탑승자의 목표 층 위치를 저장합니다.
 
     int close_door;// 문을 닫을지 결정하는 변수입니다.
 
-    ele.direction[0] = (user_floor1 > ele.floor[0]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
-    ele.direction[1] = (user_floor2 > ele.floor[1]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
-    ele.direction[2] = (user_floor3 > ele.floor[2]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
-    ele.direction[3] = (user_floor4 > ele.floor[3]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
-    ele.direction[4] = (user_floor5 > ele.floor[4]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
-    ele.direction[5] = (user_floor6 > ele.floor[5]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
+    ele.direction[0] = (ele.user_floor[0] > ele.floor[0]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
+    ele.direction[1] = (ele.user_floor[1] > ele.floor[1]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
+    ele.direction[2] = (ele.user_floor[2] > ele.floor[2]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
+    ele.direction[3] = (ele.user_floor[3] > ele.floor[3]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
+    ele.direction[4] = (ele.user_floor[4] > ele.floor[4]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
+    ele.direction[5] = (ele.user_floor[5]> ele.floor[5]) ? 1 : -1;// 사용자가 있는 층과 엘리베이터의 현재 층을 비교하여 이동 방향을 설정합니다.
     // 사용자가 있는 층으로 이동
     while (1) {
+        
         
         //1번 엘리베이터
 
         Inspection_confirm(0);//엘리베이터의 점검 여부를 확인합니다.
         ele.floor[0] += ele.direction[0];//엘리베이터를 이동시킵니다.
         if (ele.floor[0] == ele.user_floor[0])//사용자가 탑승한 엘리베이터일 경우
-        {
-            printf("1번 탑승");//탑승햇다는 문구 출력
+        {   
+            printf("1번 탑승\n");//탑승햇다는 문구 출력
             if (index + 1 == 1) {   // 선택된 엘리베이터가 1번일 때
+                Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
+                system("cls");// 콘솔 화면을 지웁니다.
+                display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
+
                 printf("문을 닫으시겠습니까? (예: 1, 아니오: 0): ");//문을 닫을건지 사용자에게 물어봄.
                 scanf("%d", &close_door);//대답을 close_door 변수에 저장.
                 close(close_door);//close 함수를 호출.
@@ -636,8 +633,12 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
         ele.floor[1] += ele.direction[1];//엘리베이터를 이동시킵니다.
         if (ele.floor[1] == ele.user_floor[1])//사용자가 탑승한 엘리베이터일 경우
         {
-            printf("2번 탑승");//탑승햇다는 문구 출력
+            printf("2번 탑승\n");//탑승햇다는 문구 출력
             if (index + 1 == 2) {   // 선택된 엘리베이터가 1번일 때
+                Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
+                system("cls");// 콘솔 화면을 지웁니다.
+                display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
+
                 printf("문을 닫으시겠습니까? (예: 1, 아니오: 0): ");//문을 닫을건지 사용자에게 물어봄.
                 scanf("%d", &close_door);//대답을 close_door 변수에 저장.
                 close(close_door);//close 함수를 호출.
@@ -653,8 +654,12 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
         ele.floor[2] += ele.direction[2];//엘리베이터를 이동시킵니다.
         if (ele.floor[2] == ele.user_floor[2])//사용자가 탑승한 엘리베이터일 경우
         {
-            printf("3번 탑승");//탑승햇다는 문구 출력
+            printf("3번 탑승\n");//탑승햇다는 문구 출력
             if (index + 1 == 3) {   // 선택된 엘리베이터가 1번일 때
+                Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
+                system("cls");// 콘솔 화면을 지웁니다.
+                display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
+
                 printf("문을 닫으시겠습니까? (예: 1, 아니오: 0): ");//문을 닫을건지 사용자에게 물어봄.
                 scanf("%d", &close_door);//대답을 close_door 변수에 저장.
                 close(close_door);//close 함수를 호출.
@@ -669,8 +674,12 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
         ele.floor[3] += ele.direction[3];//엘리베이터를 이동시킵니다.
         if (ele.floor[3] == ele.user_floor[3])//사용자가 탑승한 엘리베이터일 경우
         {
-            printf("4번 탑승");//탑승햇다는 문구 출력
+            printf("4번 탑승\n");//탑승햇다는 문구 출력
             if (index + 1 == 4) {   // 선택된 엘리베이터가 1번일 때
+                Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
+                system("cls");// 콘솔 화면을 지웁니다.
+                display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
+
                 printf("문을 닫으시겠습니까? (예: 1, 아니오: 0): ");//문을 닫을건지 사용자에게 물어봄.
                 scanf("%d", &close_door);//대답을 close_door 변수에 저장.
                 close(close_door);//close 함수를 호출.
@@ -686,8 +695,12 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
         if (ele.floor[4] == ele.user_floor[4])//사용자가 탑승한 엘리베이터일 경우
         {
 
-            printf("5번 탑승");//탑승햇다는 문구 출력
+            printf("5번 탑승\n");//탑승햇다는 문구 출력
             if (index + 1 == 5) {   // 선택된 엘리베이터가 1번일 때
+                Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
+                system("cls");// 콘솔 화면을 지웁니다.
+                display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
+
                 printf("문을 닫으시겠습니까? (예: 1, 아니오: 0): ");//문을 닫을건지 사용자에게 물어봄.
                 scanf("%d", &close_door);//대답을 close_door 변수에 저장.
                 close(close_door);//close 함수를 호출.
@@ -702,8 +715,12 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
         ele.floor[5] += ele.direction[5];//엘리베이터를 이동시킵니다.
         if (ele.floor[5] == ele.user_floor[5])//사용자가 탑승한 엘리베이터일 경우
         {
-            printf("6번 탑승");//탑승햇다는 문구 출력
+            printf("6번 탑승\n");//탑승햇다는 문구 출력
             if (index + 1 == 6) {   // 선택된 엘리베이터가 1번일 때
+                Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
+                system("cls");// 콘솔 화면을 지웁니다.
+                display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
+
                 printf("문을 닫으시겠습니까? (예: 1, 아니오: 0): ");//문을 닫을건지 사용자에게 물어봄.
                 scanf("%d", &close_door);//대답을 close_door 변수에 저장.
                 close(close_door);//close 함수를 호출.
@@ -712,17 +729,27 @@ void move_elevator(int target_floor1, int user_floor1, int target_floor2, int us
             kg(5);//임의의 탑승자의 무게를 증가.
         }
         get_off(5);//탑승자의 무게를 제외시킵니다.
-
         Sleep(500);// 0.5초 동안 프로그램을 정지합니다.
         system("cls");// 콘솔 화면을 지웁니다.
         display_elevator_status();//display_elevator_status 함수를 호출하여 엘리베이터의 상태를 출력.
 
+    
         // 모든 엘리베이터가 움직이지 않았을 경우 무한 반복문을 종료합니다.
         if ((ele.direction[0] == 0) && (ele.direction[1] == 0) && (ele.direction[2] == 0) && (ele.direction[3] == 0) && (ele.direction[5] == 0) && (ele.direction[5] == 0))
         {
             break;
         }
 
+        if (ele.floor[index] == ele.target[index])
+        {
+            printf("하차 하셨습니다 다시 탑승하시려면 enter를 눌러주세요.\n");
+            if (_kbhit()) {  // 키보드 입력이 있는지 체크
+                if (_getch() == '\r') {  // 사용자가 엔터 키를 누르면 관리자 모드로 돌아갑니다.
+                    move_elevator(ele.target[0], ele.user_floor[0], ele.target[1], ele.user_floor[1], ele.target[2], ele.user_floor[2], ele.target[3], ele.user_floor[3], ele.target[4], ele.user_floor[4], ele.target[5], ele.user_floor[5]);
+
+                }
+            }
+        }
 
     }
 }
@@ -777,6 +804,11 @@ int main()
         int c5 = random();//c5을 random 함수를 호출해 저장
         int t6 = random();//t6을 random 함수를 호출해 저장
         int c6 = random();//c6을 random 함수를 호출해 저장
+
+        for (int i = 0; i < 6; i++)
+        {
+            ele.floor[i] = random();// 각 엘리베이터의 초기 위치를 무작위로 설정합니다.
+        }
 
         move_elevator(t1, c1, t2, c2, t3, c3, t4, c4, t5, c5, t6, c6);//move_elevator 함수를 호출
     }
