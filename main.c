@@ -49,7 +49,7 @@ struct elevator
     int status[6];     // 각 엘리베이터의 현재 상태를 저장합니다. (예: 운행 중, 대기 중 등)
     int target[6];     // 각 엘리베이터의 목표 층을 저장합니다.
     int user_floor[6]; // 각 엘리베이터를 호출한 사용자의 층을 저장합니다.
-    char button[];     // 각 엘리베이터의 버튼 상태를 저장합니다. (눌린 버튼은 1, 아니면 0)
+    int button[6];     // 각 엘리베이터의 버튼 상태를 저장합니다. (눌린 버튼은 1, 아니면 0)
 }ele;// ele라는 이름의 구조체 변수를 선언합니다.
 
 // 사용자가 현재 위치한 층과 목표 층
@@ -76,6 +76,12 @@ int random() // -10 ~ 100 까지 난수 생성. 엘리베이터가 이동할 층을 무작위로 결정
 int random_gender() {  // 무작위로 성별을 결정하는 함수를 정의합니다.
     return rand() % 2;  // 0 또는 1을 무작위로 반환합니다.
 }
+
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
 
 /** @brief 성별에 따라 무게를 계산하는 함수.
 *  @date 23/11/17
@@ -106,23 +112,21 @@ bool is_valid_password(const char* password) {
 
 
 /** @brief 사용자로부터 이동하려는 층을 입력받고 검증하는 함수
-*  @date 23/11/15
+*  @date 23/11/27
 *  @return floor : 사용자가 입력한 층을 반환
 */
-int user_input()  // 사용자로부터 이동하려는 층을 입력받는 함수를 정의합니다.
-{
-    int floor;  // 사용자가 입력한 층을 저장할 변수를 선언합니다.
-    printf("어느 층으로 이동하시겠습니까? (범위: -10 ~ 100 / 0 제외): ");  // 사용자에게 입력을 요청하는 메시지를 출력합니다.
-    scanf("%d", &floor);  // 사용자의 입력을 받아 'floor' 변수에 저장합니다.
+int user_input() {
+    int floor;
+    printf("어느 층으로 이동하시겠습니까? (범위: -10 ~ 100 / 0 제외): ");
+    scanf("%d", &floor);
 
-    // 사용자가 입력한 층이 -10 ~ 100 사이가 아니면 다시 입력받습니다.
-    while ((floor < -10 || floor > 100)||(floor==0))
-    {
-        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (-10 ~ 100 / 0 제외): ");  // 잘못 입력하였음을 알리는 메시지를 출력합니다.
-        scanf("%d", &floor);  // 사용자의 입력을 다시 받아 'floor' 변수에 저장합니다.
+    while ((floor < -10 || floor > 100) || (floor == 0)) {
+        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (-10 ~ 100 / 0 제외): ");
+        while (getchar() != '\n');  // 이전에 입력한 문자들을 버퍼에서 제거합니다.
+        scanf("%d", &floor);
     }
 
-    return floor;  // 사용자가 입력한 층을 반환합니다.
+    return floor;
 }
 
 char password[] = "1234567*";  // 초기 비밀번호를 설정합니다.
@@ -159,50 +163,62 @@ bool verify_password(const char* password) {
         return false;
 }
 /** @brief 엘리베이터 점검여부를 선택하고 엘리베이터를 점검 모드로 전환하는 함수
-*  @date 23/11/16
+*  @date 23/11/27
 */
-void select_elevator_for_maintenance() {  // 엘리베이터 점검을 선택하는 함수를 정의합니다.
-    int pick = 2;  // 사용자의 선택을 저장하는 변수를 선언하고 초기화합니다.
-    int lift = 2;  // 엘리베이터 점검 상태를 저장하는 변수를 선언하고 초기화합니다.
 
-    while (1)  // 무한 루프를 시작합니다.
-    {
-        printf("돌아가기는 1번을 점검을 진행은 0을 입력하세요 >> >");  // 사용자에게 선택을 요청하는 메시지를 출력합니다.
-        scanf("%d", &pick);  // 사용자의 입력을 받아 'pick' 변수에 저장합니다.
+void select_elevator_for_maintenance() {
+    int pick = 2;
+    int lift = 2;
 
-        if (pick == 0)  // 사용자가 점검을 선택한 경우
-        {
-            while ((lift != 0) || (lift != 1))
-            {
+    while (1) {
+        printf("돌아가기는 1번을 점검을 진행은 0을 입력하세요 >> ");
+        if (scanf("%d", &pick) != 1) {
+            printf("잘못 입력하셨습니다. 다시 입력해 주세요 (0 또는 1 입력): ");
+            clear_input_buffer();
+            continue;
+        }
 
-                printf("점검 해제는 0번 점검 설정은 1번 돌아가기는 2를 눌러주세요 >> ");  // 사용자에게 점검 상태를 선택하도록 요청하는 메시지를 출력합니다.
-                scanf("%d", &lift);  // 사용자의 입력을 받아 'lift' 변수에 저장합니다.
+        if (pick == 0) {
+            while (1) {
+                printf("점검 해제는 0번, 점검 설정은 1번, 돌아가기는 2번을 입력하세요 >> ");
+                if (scanf("%d", &lift) != 1) {
+                    printf("잘못 입력하셨습니다. 다시 입력해 주세요 (0, 1, 2 입력): ");
+                    clear_input_buffer();
+                    continue;
+                }
 
-                if (lift == 1)  // 사용자가 점검 설정을 선택한 경우
-                {
-                    int elevator;  // 점검할 엘리베이터 번호를 저장하는 변수를 선언합니다.
-                    printf("점검할 엘리베이터를 선택해주세요 (1-6): ");  // 사용자에게 점검할 엘리베이터 번호를 입력하도록 요청하는 메시지를 출력합니다.
-                    scanf("%d", &elevator);  // 사용자의 입력을 받아 'elevator' 변수에 저장합니다.
-
-                    if (elevator >= 1 && elevator <= MAX_ELEVATORS) {  // 사용자가 올바른 엘리베이터 번호를 입력한 경우
-                        ele.status[elevator - 1] = 1;  // 해당 엘리베이터의 상태를 점검 중(1)으로 변경합니다.
-                        printf("%d번 엘리베이터가 점검 모드로 전환되었습니다.\n", elevator);  // 점검 모드 전환 메시지를 출력합니다.
+                if (lift == 1) {
+                    int elevator;
+                    printf("점검할 엘리베이터를 선택해주세요 (1-6): ");
+                    if (scanf("%d", &elevator) != 1) {
+                        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (1-6 사이의 숫자 입력): ");
+                        clear_input_buffer();
+                        continue;
                     }
-                    else {  // 사용자가 잘못된 엘리베이터 번호를 입력한 경우
-                        printf("잘못된 엘리베이터 번호입니다.\n");  // 오류 메시지를 출력합니다.
+
+                    if (elevator >= 1 && elevator <= 6) {
+                        ele.status[elevator - 1] = 1;
+                        printf("%d번 엘리베이터가 점검 모드로 전환되었습니다.\n", elevator);
+                    }
+                    else {
+                        printf("잘못된 엘리베이터 번호입니다.\n");
                     }
                 }
-                else if (lift == 0) {  // 사용자가 점검 해제를 선택한 경우
-                    int elevator;  // 점검을 해제할 엘리베이터 번호를 저장하는 변수를 선언합니다.
-                    printf("해제할 엘리베이터를 선택해주세요 (1-6): ");  // 사용자에게 점검을 해제할 엘리베이터 번호를 입력하도록 요청하는 메시지를 출력합니다.
-                    scanf("%d", &elevator);  // 사용자의 입력을 받아 'elevator' 변수에 저장합니다.
-
-                    if (elevator >= 1 && elevator <= MAX_ELEVATORS) {  // 사용자가 올바른 엘리베이터 번호를 입력한 경우
-                        ele.status[elevator - 1] = 0;  // 해당 엘리베이터의 상태를 정상(0)으로 변경합니다.
-                        printf("%d번 엘리베이터가 점검 해제로 전환되었습니다.\n", elevator);  // 점검 해제 메시지를 출력합니다.
+                else if (lift == 0) {
+                    int elevator;
+                    printf("해제할 엘리베이터를 선택해주세요 (1-6): ");
+                    if (scanf("%d", &elevator) != 1) {
+                        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (1-6 사이의 숫자 입력): ");
+                        clear_input_buffer();
+                        continue;
                     }
-                    else {  // 사용자가 잘못된 엘리베이터 번호를 입력한 경우
-                        printf("잘못된 엘리베이터 번호입니다.\n");  // 오류 메시지를 출력합니다.
+
+                    if (elevator >= 1 && elevator <= 6) {
+                        ele.status[elevator - 1] = 0;
+                        printf("%d번 엘리베이터가 점검 해제로 전환되었습니다.\n", elevator);
+                    }
+                    else {
+                        printf("잘못된 엘리베이터 번호입니다.\n");
                     }
                 }
                 else {
@@ -210,8 +226,11 @@ void select_elevator_for_maintenance() {  // 엘리베이터 점검을 선택하는 함수를 �
                 }
             }
         }
-        else if (pick == 1) {  // 사용자가 돌아가기를 선택한 경우
-            break;  // 무한 루프를 종료합니다.
+        else if (pick == 1) {
+            break;
+        }
+        else {
+            printf("잘못 입력하셨습니다. 다시 입력해 주세요 (0 또는 1 입력): ");
         }
     }
 }
@@ -284,17 +303,26 @@ void admin_display()  // 관리자 화면을 출력하는 함수를 정의합니다.
             printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");
             for (int i = 0; i < MAX_ELEVATORS; i++) {  // 각 엘리베이터에 대해 반복합니다.
                 if (ele.status[i] == 3) {  // 해당 엘리베이터가 점검 중인 경우
-                    printf("점검중 ");  // '점검중'이라는 메시지를 출력합니다.
+                    printf(" 점검중\t\t");  // '점검중'이라는 메시지를 출력합니다.
                 }
-                else {// 해당 엘리베이터가 점검 중이 아닌 경우
-                    printf("            ");// 빈 칸을 출력합니다.
+                else {
+                    printf("\t\t");
                 }
+
             }
-            printf("  목표층 :%3d   목표층 :%3d   목표층 :%3d   목표층 :%3d   목표층 :%3d   목표층 :%3d \n", ele.target[0], ele.target[1], ele.target[2], ele.target[3], ele.target[4], ele.target[5]);// 각 엘리베이터의 목표 층을 출력합니다.
+            printf("\n");
             printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");
-            printf("  방향 : %c   방향 :%c   방향  :%c   방향 :%c   방향 :%c   방향 :%c \n", ele.button[0], ele.button[1], ele.button[2], ele.button[3], ele.button[4], ele.button[5]);// 각 엘리베이터의 이동 방향을 출력합니다.
+            printf(" 목표층 :%3d  목표층 :%3d  목표층 :%3d  목표층 :%3d  목표층 :%3d  목표층 :%3d \n", ele.target[0], ele.target[1], ele.target[2], ele.target[3], ele.target[4], ele.target[5]);// 각 엘리베이터의 목표 층을 출력합니다.
+            printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");
+            printf("  방향 : %s   방향 :%s     방향  :%s   방향 :%s     방향 :%s     방향 :%s \n",
+                ele.direction[0] == 1 ? "상" : (ele.direction[0] == 0 ? "정지" : "하"),
+                ele.direction[1] == 1 ? "상" : (ele.direction[1] == 0 ? "정지" : "하"),
+                ele.direction[2] == 1 ? "상" : (ele.direction[2] == 0 ? "정지" : "하"),
+                ele.direction[3] == 1 ? "상" : (ele.direction[3] == 0 ? "정지" : "하"),
+                ele.direction[4] == 1 ? "상" : (ele.direction[4] == 0 ? "정지" : "하"),
+                ele.direction[5] == 1 ? "상" : (ele.direction[5] == 0 ? "정지" : "하"));// 각 엘리베이터의 이동 방향을 출력합니다.
             printf("└────────────┴────────────┴────────────┴────────────┴────────────┴────────────┘\n");
-            printf("엘리베이터 현황 나가기 >>> enter 클릭");
+            printf("엘리베이터 현황 나가기 >>> enter 클릭\n");
             fflush(stdin);  // 입력 버퍼를 비웁니다.
             if (_kbhit()) {  // 키보드 입력이 있는지 체크
                 if (_getch() == '\r') {  // 사용자가 엔터 키를 누르면 관리자 모드로 돌아갑니다.
@@ -409,57 +437,69 @@ void admin_move_elevator()
 }
 
 /**@brief 관리자 모드를 실행할지 물어보고 어떤 기능을 사용할지 물어봄 
-*  @date 23/11/17
+*  @date 23/11/27
 */
-void adminmode() {  // 관리자 모드를 실행하는 함수를 정의합니다.
-    int e = 2;  // 사용자의 선택을 저장하는 변수를 선언하고 초기화합니다.
-    printf("프로그램 종료를 원하시면 0을, 계속하려면 1을, 관리자 모드 진입은 2를 입력해주세요: ");  // 사용자에게 입력을 요청하는 메시지를 출력합니다.
-    scanf("%d", &e);  // 사용자의 입력을 받아 변수에 저장합니다.
+void adminmode() {
+    int e = 2;
+    printf("프로그램 종료를 원하시면 0을, 엘리베이터 이용은 1을, 관리자 모드 진입은 2를 입력해주세요: ");
+    scanf("%d", &e);
 
-    while (e != 0 && e != 1 && e != 2) {  // 사용자의 입력이 0, 1, 2 중 하나가 아닌 경우에 반복문을 실행합니다.
-        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (0, 1 또는 2): ");  // 잘못된 입력임을 알리는 메시지를 출력하고, 다시 입력을 요청하는 메시지를 출력합니다.
-        scanf("%d", &e);  // 사용자의 새로운 입력을 받습니다.
+    while (e != 0 && e != 1 && e != 2) {
+        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (0, 1 또는 2): ");
+        clear_input_buffer();
+        scanf("%d", &e);
     }
-    if (e == 0) {  // 사용자의 입력이 0인 경우,
-        printf("프로그램을 종료합니다.\n");  // 프로그램 종료 메시지를 출력하고,
-        exit(0);  // 프로그램을 종료합니다.
+
+    if (e == 0) {
+        printf("프로그램을 종료합니다.\n");
+            exit(0);
     }
-    else if (e == 2) {  // 사용자의 입력이 2인 경우,
-        char input_password[21];  // 사용자의 비밀번호 입력을 저장하는 변수를 선언합니다.
-        printf("3번 일치하지않으면 사용자 모드로 돌아갑니다.\n");  // 비밀번호 오류 횟수 제한을 알리는 메시지를 출력합니다.
-        printf("비밀번호를 입력해주세요: ");  // 비밀번호 입력을 요청하는 메시지를 출력합니다.
-        scanf("%20s", &input_password);  // 사용자의 입력을 받아 변수에 저장합니다.
-        int i = 0;  // 카운터 변수를 선언하고 초기화합니다.
+    else if (e == 2) {
+        char input_password[21];
+        printf("3번 일치하지 않으면 사용자 모드로 돌아갑니다.\n");
+            printf("비밀번호를 입력해주세요: ");
+        clear_input_buffer();
+        scanf("%20s", input_password);
 
-        if (verify_password(input_password)) {  // 사용자의 입력이 관리자 비밀번호와 일치하는 경우,
-            printf("관리자 모드에 진입합니다.\n");  // 관리자 모드 진입 메시지를 출력하고,
-            adminMode = 1;  // 관리자 모드를 활성화합니다.
+        int i = 0;
+        int wrong_count = 0;
 
-            while (adminMode) {  // 관리자 모드가 활성화된 동안에 반복문을 실행합니다.
-                printf("엘리베이터 점검은 1을, 비밀번호 변경은 2를, 엘리베이터 현황판은 3 ,관리자 모드 종료는 4을 입력해주세요: ");  // 사용자에게 입력을 요청하는 메시지를 출력합니다.
-                scanf("%d", &e);  // 사용자의 입력을 받아 변수에 저장합니다.
-
-                if (e == 1) {  // 사용자의 입력이 1인 경우,
-                    select_elevator_for_maintenance();  // 엘리베이터 점검 함수를 호출합니다.
-                }
-                else if (e == 2) {  // 사용자의 입력이 2인 경우,
-                    change_password();  // 비밀번호 변경 함수를 호출합니다.
-                }
-                else if (e == 3) {  // 사용자의 입력이 3인 경우,
-                    admin_move_elevator();  // 엘리베이터 현황 출력 함수를 호출합니다.
-                }
-                else if (e == 4) {  // 사용자의 입력이 4인 경우,
-                    printf("관리자 모드를 종료합니다.\n");  // 관리자 모드 종료 메시지를 출력하고,
-                    adminMode = 0;  // 관리자 모드를 비활성화합니다.
-                }
-                else {  // 사용자의 입력이 1, 2, 3, 4 중 하나가 아닌 경우,
-                    printf("잘못된 입력입니다.\n");  // 잘못된 입력임을 알리는 메시지를 출력합니다.
-                }
+        while (!verify_password(input_password)) {
+            wrong_count++;
+            if (wrong_count == 3) {
+                printf("비밀번호가 일치하지 않습니다. 다시 입력해 주세요.\n");
+                    adminmode();
+                return;
             }
+
+            printf("비밀번호가 일치하지 않습니다. 다시 입력해 주세요: ");
+            clear_input_buffer();
+            scanf("%20s", input_password);
         }
-        else {  // 사용자의 입력이 관리자 비밀번호와 일치하지 않는 경우,
-            Sleep(1000);  // 1초 동안 대기하고,
-            adminmode();  // 관리자 모드 함수를 다시 호출합니다.
+
+        printf("관리자 모드에 진입합니다.\n");
+            int adminMode = 1;
+
+        while (adminMode) {
+            printf("엘리베이터 점검은 1을, 비밀번호 변경은 2를, 엘리베이터 현황판은 3, 관리자 모드 종료는 4을 입력해주세요: ");
+            scanf("%d", &e);
+
+            if (e == 1) {
+                select_elevator_for_maintenance();
+            }
+            else if (e == 2) {
+                change_password();
+            }
+            else if (e == 3) {
+                admin_move_elevator();
+            }
+            else if (e == 4) {
+                printf("관리자 모드를 종료합니다.\n");
+                    adminMode = 0;
+            }
+            else {
+                printf("잘못된 입력입니다.\n");
+            }
         }
     }
 }
@@ -473,19 +513,13 @@ int user_sex() {  // 사용자의 성별에 따른 평균 체중을 반환하는 함수를 정의합니다
     printf("남자면 0 여자면 1을 눌러주세요.");  // 사용자에게 입력을 요청하는 메시지를 출력합니다.
     scanf("%d", &sex);  // 사용자의 입력을 받아 변수에 저장합니다.
 
-    do {  // 반복문을 시작합니다.
-        if (sex == 0) {  // 사용자의 입력이 0인 경우,
-            break;  // 반복문을 종료합니다.
-        }
-        else if (sex == 1) {  // 사용자의 입력이 1인 경우,
-            break;  // 반복문을 종료합니다.
-        }
-        else {  // 사용자의 입력이 0도 1도 아닌 경우,
-            printf("잘못된 입력입니다 다시 입력해주세요.\n");  // 잘못된 입력임을 알리는 메시지를 출력하고,
-            printf("남자면 0 여자면 1을 눌러주세요.");  // 다시 입력을 요청하는 메시지를 출력합니다.
-            scanf("%d", &sex);  // 사용자의 새로운 입력을 받습니다.
-        }
-    } while (sex != 1 && sex != 0);  // 사용자의 입력이 1이 아니고, 0도 아닌 경우에 반복문을 계속 실행합니다.
+    while (sex != 1 && sex != 0) {
+        printf("잘못된 입력입니다. 숫자만 입력해주세요.\n");
+        printf("남자면 0, 여자면 1을 입력해주세요: ");
+        while (getchar() != '\n');  // 이전에 입력한 문자들을 버퍼에서 제거합니다.
+        scanf("%d", &sex);
+    }
+
 
     int kg;  // 체중을 저장할 변수를 선언합니다.
     if (sex == 0) {  // 사용자의 입력이 0인 경우,
@@ -529,20 +563,20 @@ int elevator_selection(int current_floor, int target_floor) { // 사용자가 가장 �
 }
 
 /** @brief 사용자의 현재위치를 입력받고 사용자의 현재 위치를 반환하는 함수
-*  @date 2023/11/17
+*  @date 2023/11/27
 *  @return 사용자의 현재 위치를 반환
 */
 int user_location() { // 사용자의 현재 위치를 입력받는 함수를 정의합니다.
     int a; // 사용자의 현재 위치를 저장할 변수를 선언합니다.
     printf("어느 층에 계신가요? (-10 ~ 100 / 0 제외 )\n"); // 사용자에게 현재 위치를 입력받습니다.
     scanf("%d", &a); // 사용자의 입력을 변수에 저장합니다.
-    while ((a < -10 || a > 100)||(a==0))
-    {
-        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (-10 ~ 100 / 0 제외 ): ");  // 잘못 입력하였음을 알리는 메시지를 출력합니다.
-        scanf("%d", &a);  // 사용자의 입력을 다시 받아 'floor' 변수에 저장합니다.
+    while ((a < -10 || a > 100) || (a == 0)) {
+        printf("잘못 입력하셨습니다. 다시 입력해 주세요 (-10 ~ 100 / 0 제외 ): ");
+        while (getchar() != '\n');  // 이전에 입력한 문자들을 버퍼에서 제거합니다.
+            scanf("%d", &a);
     }
 
-    return a; // 사용자의 현재 위치를 반환합니다.
+    return a;
 }
 
 
@@ -562,7 +596,7 @@ void display_elevator_status() // 엘리베이터의 상태를 출력하는 함수를 정의합니다
         ele.floor[4] != 0 ? ele.floor[4] : (ele.direction[4] == -1 ? -1 : 1),
         ele.floor[5] != 0 ? ele.floor[5] : (ele.direction[5] == -1 ? -1 : 1));// 각 엘리베이터의 현재 층을 출력합니다.
     printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");// 각 엘리베이터의 상태를 구분하는 라인을 출력합니다.
-    printf("  무게 : %3d  무게 : %3d    무게 : %3d   무게 : %3d   무게 : %3d   무게 : %3d \n", ele.kg[0], ele.kg[1], ele.kg[2], ele.kg[3], ele.kg[4], ele.kg[5]);
+    printf("  무게 : %3d  무게 : %3d  무게 : %3d   무게 : %3d  무게 : %3d   무게 : %3d \n", ele.kg[0], ele.kg[1], ele.kg[2], ele.kg[3], ele.kg[4], ele.kg[5]);
     printf("├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤\n");// 각 엘리베이터의 상태를 구분하는 라인을 출력합니다.
     printf(" ");
     printf(" ");
@@ -582,11 +616,18 @@ void display_elevator_status() // 엘리베이터의 상태를 출력하는 함수를 정의합니다
 }
 
 /** @brief 엘리베이터 문을 여닫는 경우 그에따른 문구출력과 그에따른 엘리베이터 동작 속도를 조절.
-* @date 2023/11/17
+* @date 2023/11/27
 *  @param close_door : 문을 여닫는 사용자의 의견을 인자로 가짐
 */
 void close(int close_door)
 {
+    while (( close_door !=0 )&& (close_door != 1)) 
+    {
+        printf("잘못 입력하셨습니다. 다시 입력해 주세요 : ");
+        clear_input_buffer();
+        scanf("%d", &close_door);
+    }
+
     if (close_door) {//닫는 경우
         printf("문을 닫습니다. 1초 후 출발합니다.\n");//문을 닫는다는 문구를 출력.
         Sleep(1000); // 1초 대기
@@ -598,7 +639,7 @@ void close(int close_door)
 }
 
 /** @brie엘리베이터를 이동해주며 문 닫힘을 실행하는 함수
-*  @date 23/11/19
+* @date 23/11/19
 * @param target_floor1, user_floor1, target_floor2, user_floor2, target_floor3, user_floor3,
          target_floor4, user_floor4, target_floor5, user_floor5, target_floor6, user_floor6
          : 각각의 엘리베이터의 현재 위치와 목표 층
@@ -612,6 +653,20 @@ void move_elevator()
     // 사용자의 현재 층과 원하는 목적지를 입력받습니다.
     int a = user_location(); // 사용자의 현재 층을 입력받습니다.
     int f = user_input(); // 사용자의 원하는 목적지를 입력받습니다.
+
+    while (1)
+    {
+        if (a == f)
+        {
+            printf("같은 층으로 이동할 수 없습니다.\n");
+            a=user_location();
+            f=user_input(); //
+        }
+        else
+        {
+            break;
+        }
+    }
 
     // 각 층의 엘리베이터 층수가 결정된 후에 가장 적합한 엘리베이터를 선택합니다.
     int index = elevator_selection(a, f); // 가장 가까운 엘리베이터의 인덱스를 선택합니다.
@@ -783,7 +838,7 @@ void move_elevator()
             break;
         }
 
-        if (ele.floor[index] == ele.target[index])
+        if ((ele.floor[index] == ele.target[index])&&(ele.user_floor[index] = -11))
         {
             printf("하차 하셨습니다 다시 탑승하시려면 enter를 눌러주세요.\n");
             if (_kbhit()) {  // 키보드 입력이 있는지 체크
@@ -815,10 +870,10 @@ void button()//함수의 이름
     {
         if (ele.direction[i] == 1)//상승중일 경우
         {
-            ele.button[i] = "상";// '상' 이라는 문구 저장
+            ele.button[i] = 1;// '상' 이라는 문구 저장
         }
         else {//하강중일 경우
-            ele.button[i] = "하"; // '하' 라는 문구 저장
+            ele.button[i] = 0; // '하' 라는 문구 저장
         }
     }
 }
